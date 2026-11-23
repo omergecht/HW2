@@ -170,7 +170,31 @@ public class BigramModel {
      * @pre: fileName is a legal file path
      */
     public void loadModel(String fileName) throws IOException { // Question 4
-        // TODO: implement
+        String vocFileName = fileName + VOC_FILE_SUFFIX;
+        String countsFileName = fileName + COUNTS_FILE_SUFFIX;
+
+        // load .voc file
+        BufferedReader vocReader = new BufferedReader(new FileReader(vocFileName));
+        String line = vocReader.readLine(); // read the first line to get the number of words
+        int numWords = Integer.parseInt(line.split(" ")[0]); // extract the number of words from the first line
+        mVocabulary = new String[numWords];
+        for (int i = 0; i < numWords; i++) {
+            line = vocReader.readLine();
+            mVocabulary[i] = line.split(",")[1]; // extract the word from the line and store it in mVocabulary
+        }
+        vocReader.close();
+
+        // load .counts file
+        mBigramCounts = new int[numWords][numWords];
+        BufferedReader countsReader = new BufferedReader(new FileReader(countsFileName));
+        while ((line = countsReader.readLine()) != null) {
+            String[] parts = line.split(":"); // split the line into two parts: the indices and the count
+            int index1 = Integer.parseInt(parts[0].split(",")[0]); // extract the  indexes from the first part
+            int index2 = Integer.parseInt(parts[0].split(",")[1]);
+            int count = Integer.parseInt(parts[1]); // extract the count from the second part
+            mBigramCounts[index1][index2] = count; // store the count in mBigramCounts 
+        }
+        countsReader.close();
     }
 
     /*
@@ -180,8 +204,18 @@ public class BigramModel {
      * @post: if sentence is probable, according to the model, $ret = true, else, $ret = false
      */
     public boolean isLegalSentence(String sentence) { // Question 5
-        // TODO: implement
-        return false;
+        String[] words = sentence.split(" ");
+        if (words.length == 1) { // If the sentence has only one word, check if it is in the vocabulary
+            return findIndex(mVocabulary, words[0]) != ELEMENT_NOT_FOUND;
+        }
+        for (int i = 0; i < words.length - 1; i++) {
+            String word1 = words[i];
+            String word2 = words[i + 1];
+            if (getBigramCount(word1, word2) == 0) { // If the count of the bigram [word1][word2] is zero, return false
+                return false;
+            }
+        }
+        return true; // If all bigrams in the sentence have non-zero counts, return true
     }
 
     ///////////////////////////////////////////////////////////////////////////

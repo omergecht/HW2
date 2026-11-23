@@ -6,35 +6,43 @@ package il.ac.tau.cs.software1.inventory;
 public class NaiveInventory implements Inventory {
 
 	private static final int INITIAL_CAPACITY = 100;
-
-	// TODO: add the fields:
-	//       - an array of Collectibles (it may be larger than the number of items actually stored)
-	//       - an int that counts how many items are actually stored
+	private Collectible[] mCollectibles;
+	private int actualCount;
 
 	public NaiveInventory() {
-		// TODO: implement
+		mCollectibles = new Collectible[INITIAL_CAPACITY];
+		actualCount = 0;
 	}
 
 	@Override
 	public void collect(Collectible collectible) {
-		// TODO: implement
+		if (actualCount >= mCollectibles.length) {
+			// resize the array
+			Collectible[] newArray = new Collectible[mCollectibles.length * 2];
+			for (int i = 0; i < mCollectibles.length; i++) {
+				newArray[i] = mCollectibles[i];
+			}
+			mCollectibles = newArray;
+		}
+		mCollectibles[actualCount++] = collectible;
 	}
 
 	@Override
 	public float getTotalWeight() {
-		// TODO: implement
-		return 0.f;
+		float totalWeight = 0; // initialize total weight to 0
+		for (int i = 0; i < actualCount; i++) { // count only the actual collectibles, not the entire array
+			totalWeight += mCollectibles[i].getWeight();
+		}
+		return totalWeight;
 	}
 
 	@Override
 	public int getCurrentCount() {
-		// TODO: implement
-		return 0;
+		return actualCount;
 	}
 
 	// Returns the array of Collectibles that is stored in the field of this class
 	public Collectible[] getCollArr() {
-		// TODO: implement
-		return null;
+		return mCollectibles;
 	}
 }
