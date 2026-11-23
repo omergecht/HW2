@@ -1,6 +1,11 @@
 package il.ac.tau.cs.software1.bigram;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Locale;
 
 public class BigramModel {
@@ -79,8 +84,28 @@ public class BigramModel {
      * @post: mBigramCounts = prev(mBigramCounts)
      */
     public String[] buildVocabularyIndex(String fileName) throws IOException { // Question 1
-        // TODO: implement
-        return null;
+        int size = 0;
+        String[] vocabulary = new String[MAX_VOCABULARY_SIZE];
+        BufferedReader reader = new BufferedReader(new FileReader(fileName));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] tokens = line.trim().split("\\s+"); // Split the line into tokens based on whitespace
+            for (String token : tokens) {
+                String normalizedWord = normalizeWord(token); // Normalize the token
+                if (normalizedWord != null && findIndex(vocabulary, normalizedWord) == ELEMENT_NOT_FOUND) {
+                    if (size < MAX_VOCABULARY_SIZE) { // Check if the vocabulary size limit is not exceeded, if not, add the normalized word to the vocabulary
+                        vocabulary[size++] = normalizedWord;
+                    } 
+                    else {
+                        // Vocabulary size exceeded, return the vocabulary array
+                        reader.close();
+                        return vocabulary;
+                    }
+                }
+            }
+        }
+        reader.close();
+        return Arrays.copyOf(vocabulary, size); // Return a copy of the vocabulary array with the actual size
     }
 
     /*
@@ -88,8 +113,26 @@ public class BigramModel {
      * @post: mBigramCounts = prev(mBigramCounts)
      */
     public int[][] buildCountsArray(String fileName, String[] vocabulary) throws IOException { // Question 2
-        // TODO: implement
-        return null;
+        int[][] counts = new int[vocabulary.length][vocabulary.length];
+        BufferedReader reader = new BufferedReader(new FileReader(fileName));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] tokens = line.trim().split("\\s+"); // Split the line into tokens based on whitespace
+            String prevWord = null;
+            for (String token : tokens) {
+                String normalizedWord = normalizeWord(token); // Normalize the token
+                if (normalizedWord != null && prevWord != null) { // If the normalized word is valid and there is a previous word, find the indices of the previous and current normalized words in the vocabulary
+                    int index1 = findIndex(vocabulary, prevWord);
+                    int index2 = findIndex(vocabulary, normalizedWord);
+                    if (index1 != ELEMENT_NOT_FOUND && index2 != ELEMENT_NOT_FOUND) {
+                        counts[index1][index2]++; // Increment the count for the bigram <prevWord, normalizedWord>
+                    }
+                }
+                prevWord = normalizedWord; // Update prevWord to the current normalized word, even if it is null
+            }
+        }
+        reader.close();
+        return counts;
     }
 
     /*
@@ -97,7 +140,30 @@ public class BigramModel {
      * @pre: fileName is a legal file path
      */
     public void saveModel(String fileName) throws IOException { // Question 3
-        // TODO: implement
+        String vocFileName = fileName + VOC_FILE_SUFFIX;
+        String countsFileName = fileName + COUNTS_FILE_SUFFIX;
+
+        // start with .voc file
+        BufferedWriter vocWriter = new BufferedWriter(new FileWriter(vocFileName));
+        vocWriter.write(mVocabulary.length + " words");
+        vocWriter.newLine();
+        for (int i = 0; i < mVocabulary.length; i++) {
+            vocWriter.write(i + "," + mVocabulary[i]);
+            vocWriter.newLine();
+        }
+        vocWriter.close();
+
+        // now the .counts file
+        BufferedWriter countsWriter = new BufferedWriter(new FileWriter(countsFileName));
+        for (int i = 0; i < mBigramCounts.length; i++) { 
+            for (int j = 0; j < mBigramCounts[i].length; j++) {
+                if (mBigramCounts[i][j] > 0) { // only write non-zero counts
+                    countsWriter.write(i + "," + j + ":" + mBigramCounts[i][j]);
+                    countsWriter.newLine();
+                }
+            }
+        }
+        countsWriter.close();
     }
 
     /*
