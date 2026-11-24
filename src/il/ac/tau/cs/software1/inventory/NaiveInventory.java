@@ -16,15 +16,14 @@ public class NaiveInventory implements Inventory {
 
 	@Override
 	public void collect(Collectible collectible) {
-		if (actualCount >= mCollectibles.length) {
-			// resize the array
+		if (actualCount >= mCollectibles.length) { // resize the array
 			Collectible[] newArray = new Collectible[mCollectibles.length * 2];
 			for (int i = 0; i < mCollectibles.length; i++) {
 				newArray[i] = mCollectibles[i];
 			}
 			mCollectibles = newArray;
 		}
-		mCollectibles[actualCount++] = collectible;
+		mCollectibles[actualCount++] = collectible; // add the collectible to the array and increment the count
 	}
 
 	@Override

@@ -31,7 +31,6 @@ public class BigramModelTester {
 
     // MY own test class
 
-// ניתן להדביק בתוך BigramModelTester ולהריץ מתוך main
 public class LocalBigramTests {
 
     public static void runAllTests() throws IOException {
