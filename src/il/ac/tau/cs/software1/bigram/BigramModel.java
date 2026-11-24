@@ -204,6 +204,9 @@ public class BigramModel {
      * @post: if sentence is probable, according to the model, $ret = true, else, $ret = false
      */
     public boolean isLegalSentence(String sentence) { // Question 5
+        if (sentence.isEmpty()) { // If the sentence is empty, return true
+            return true;
+        }
         String[] words = sentence.split(" ");
         if (words.length == 1) { // If the sentence has only one word, check if it is in the vocabulary
             return findIndex(mVocabulary, words[0]) != ELEMENT_NOT_FOUND;
