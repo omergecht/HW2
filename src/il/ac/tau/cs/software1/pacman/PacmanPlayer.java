@@ -43,9 +43,9 @@ public class PacmanPlayer extends PacmanGameObject {
 		else if (other instanceof PacmanBonus) {
 			PacmanBonus bonus = (PacmanBonus) other;
 			if (inventoryComponent.getInventory().getTotalWeight() + bonus.getWeight() <= inventoryComponent.getMaxWeight()) { // check if the bonus can be carried
+				bonus.getTransformComponent().position = inventoryComponent.getInventoryPosition(); // move the bonus to the inventory position
 				inventoryComponent.getInventory().collect(bonus); // add the bonus to the inventory
 				addScore(bonus.bonusScore); // add the bonus score to the player's score
-				bonus.getTransformComponent().position = inventoryComponent.getInventoryPosition(); // move the bonus to the inventory position
 			}
 		}
 	}
