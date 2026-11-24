@@ -125,7 +125,7 @@ public class BigramModel {
                     int index1 = findIndex(vocabulary, prevWord);
                     int index2 = findIndex(vocabulary, normalizedWord);
                     if (index1 != ELEMENT_NOT_FOUND && index2 != ELEMENT_NOT_FOUND) {
-                        counts[index1][index2]++; // Increment the count for the bigram <prevWord, normalizedWord>
+                        counts[index1][index2]++; // Increment the count for [prevWord][normalizedWord]
                     }
                 }
                 prevWord = normalizedWord; // Update prevWord to the current normalized word, even if it is null
